@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spotlight Grammar — распределение тем</title>
+<style>
+:root {
+  --bg:#f6f7fb; --card:#fff; --text:#202333; --muted:#74798a; --line:#e7e9f1;
+  --arina:#d94f8a; --arina-bg:#fff0f6; --dasha:#4d77d9; --dasha-bg:#eef3ff;
+  --accent:#5b4fe8; --shadow:0 8px 28px rgba(30,34,60,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:36px 22px 60px}
+.hero{background:linear-gradient(135deg,#29265f,#685cf2);color:#fff;border-radius:26px;padding:30px;box-shadow:var(--shadow)}
+.hero h1{margin:0 0 8px;font-size:clamp(28px,4vw,46px);line-height:1.05}
+.hero p{margin:0;opacity:.84;max-width:760px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+.stat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:14px 16px}
+.stat b{font-size:25px;display:block}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0 14px}
+.search{flex:1;min-width:240px}
+input[type=search]{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 14px;font-size:15px;outline:none}
+input[type=search]:focus{border-color:#afa9ff;box-shadow:0 0 0 3px #eceaff}
+.btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 13px;cursor:pointer;color:var(--text);font-weight:650}
+.btn:hover{border-color:#c9cbe0}
+.btn.active{background:#26244f;color:#fff;border-color:#26244f}
+.grade-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}
+.grade-tab{border:0;background:#e9ebf3;color:#3c4054;padding:10px 15px;border-radius:999px;cursor:pointer;font-weight:700}
+.grade-tab.active{background:var(--accent);color:#fff}
+.toolbar-note{color:var(--muted);font-size:13px;margin-left:auto}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:start;box-shadow:0 2px 12px rgba(35,38,65,.035)}
+.card.done{opacity:.58}
+.card.done .topic{text-decoration:line-through}
+.num{width:30px;height:30px;border-radius:10px;background:#f0f1f6;display:grid;place-items:center;font-weight:800;color:#676b7c;font-size:12px}
+.topic{font-size:16px;font-weight:750;margin:0 0 5px}
+.meta{font-size:12px;color:var(--muted)}
+.owner{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 9px;font-size:12px;font-weight:800;white-space:nowrap}
+.owner.arina{background:var(--arina-bg);color:var(--arina)}
+.owner.dasha{background:var(--dasha-bg);color:var(--dasha)}
+.check{display:flex;align-items:center;gap:7px;margin-top:8px;font-size:12px;color:var(--muted);cursor:pointer;user-select:none}
+.check input{width:16px;height:16px;accent-color:var(--accent)}
+.section-head{display:flex;align-items:end;justify-content:space-between;margin:24px 2px 12px;gap:16px}
+.section-head h2{margin:0;font-size:25px}
+.section-head span{color:var(--muted);font-size:13px}
+.empty{grid-column:1/-1;background:#fff;border:1px dashed #ced1df;border-radius:16px;padding:32px;text-align:center;color:var(--muted)}
+.footer{margin-top:24px;color:var(--muted);font-size:12px;text-align:center}
+.copy-toast{position:fixed;right:20px;bottom:20px;background:#24233d;color:#fff;padding:11px 15px;border-radius:12px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s}
+.copy-toast.show{opacity:1;transform:none}
+
+.details{margin-top:11px;padding:11px 12px;border-radius:12px;background:#f8f9fc;border:1px solid #edf0f6;font-size:13px;line-height:1.5;color:#4d5263}
+.details b{display:block;margin-bottom:4px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#7a7f90}
+@media (max-width:760px){
+  .stats{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}
+  .toolbar-note{width:100%;margin-left:0}
+  .hero{padding:24px 20px}
+  .wrap{padding:20px 14px 40px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>Spotlight Grammar · 5–9 классы</h1>
+    <p>По 20 укрупнённых грамматических тем на каждый класс. Близкие пункты из содержания Spotlight объединены в одну тему, чтобы список не дробился на десятки мелких подпунктов. Отметки «готово» сохраняются в этом браузере.</p>
+    <div class="stats">
+      <div class="stat"><span>Всего тем</span><b id="totalCount">100</b></div>
+      <div class="stat"><span>Арина</span><b id="arinaCount">50</b></div>
+      <div class="stat"><span>Даша</span><b id="dashaCount">50</b></div>
+    </div>
+  </section>
+
+  <div class="controls">
+    <div class="search"><input id="search" type="search" placeholder="Найти тему: Present Perfect, Passive Voice…"></div>
+    <button class="btn active" data-owner="all">Все</button>
+    <button class="btn" data-owner="Арина">Арина</button>
+    <button class="btn" data-owner="Даша">Даша</button>
+    <button class="btn" id="copyArina">Скопировать Арину</button>
+    <button class="btn" id="copyDasha">Скопировать Дашу</button>
+  </div>
+
+  <div class="grade-tabs" id="gradeTabs"></div>
+
+  <div class="section-head">
+    <div>
+      <h2 id="gradeTitle">5 класс</h2>
+      <span id="gradeSummary"></span>
+    </div>
+    <span class="toolbar-note">В каждом классе: 20 тем = 10 Арине + 10 Даше</span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="footer">Spotlight Student’s Book 5–9 · близкие грамматические пункты объединены в крупные рабочие темы.</div>
+</div>
+<div class="copy-toast" id="toast">Скопировано</div>
+
+<script>
+const items = [{"grade": "5", "topic": "Imperative", "ref": "Starter / 4b", "owner": "Арина", "desc": "Утвердительные и отрицательные команды и инструкции: Open…, Be…, Don’t…, Don’t be…."}, {"grade": "5", "topic": "Articles: a/an, the, zero article", "ref": "1a / 9a", "owner": "Даша", "desc": "a/an, the и нулевой артикль; выбор артикля в простых контекстах."}, {"grade": "5", "topic": "Pronouns: personal & object", "ref": "1b / 4a", "owner": "Арина", "desc": "Личные местоимения в роли подлежащего и объектные местоимения; замена существительных местоимениями."}, {"grade": "5", "topic": "Verb to be: present & past (was/were)", "ref": "1b / 9a", "owner": "Даша", "desc": "am/is/are и was/were; утверждения, отрицания, вопросы и краткие ответы."}, {"grade": "5", "topic": "Questions: or-questions & tag questions", "ref": "1b / 5b–5c / 7a", "owner": "Арина", "desc": "Альтернативные вопросы с or и tag questions; порядок слов и выбор вспомогательного глагола."}, {"grade": "5", "topic": "Have got", "ref": "2a", "owner": "Даша", "desc": "have got / has got; отрицания и вопросы; принадлежность, внешность, личные вещи."}, {"grade": "5", "topic": "Plurals & demonstratives: this/these, that/those", "ref": "2b", "owner": "Арина", "desc": "Множественное число существительных; this/these и that/those; согласование с существительным."}, {"grade": "5", "topic": "There is / there are", "ref": "3b", "owner": "Даша", "desc": "there is / there are в утверждениях, отрицаниях и вопросах; описание наличия предметов."}, {"grade": "5", "topic": "Possessives: adjectives, possessive case, whose", "ref": "3b / 4a–4b", "owner": "Арина", "desc": "Притяжательные прилагательные, ’s/s’ и вопрос Whose…?; выражение принадлежности."}, {"grade": "5", "topic": "Prepositions of place & time", "ref": "3c / 6a", "owner": "Даша", "desc": "Основные предлоги места и времени; расположение предметов, время и части дня."}, {"grade": "5", "topic": "Can / can’t: ability", "ref": "4a / 10a", "owner": "Арина", "desc": "can/can’t для способности; вопросы и краткие ответы о том, что человек умеет делать."}, {"grade": "5", "topic": "Present Simple", "ref": "5a–5c", "owner": "Даша", "desc": "Утверждение, отрицание, вопросы; do/does, -s/-es; привычки, факты и регулярные действия."}, {"grade": "5", "topic": "Adverbs of frequency", "ref": "6a", "owner": "Арина", "desc": "always, usually, often, sometimes, never и их позиция с обычными глаголами и be."}, {"grade": "5", "topic": "Present Continuous", "ref": "6b", "owner": "Даша", "desc": "am/is/are + V-ing; утверждение, отрицание, вопросы; действия, происходящие сейчас."}, {"grade": "5", "topic": "Present Simple vs Present Continuous", "ref": "7b", "owner": "Арина", "desc": "Различие привычек/фактов и действий «сейчас»; выбор времени по контексту и маркерам."}, {"grade": "5", "topic": "Countable / uncountable nouns", "ref": "8a", "owner": "Даша", "desc": "Исчисляемые и неисчисляемые существительные; формы singular/plural в контексте еды и напитков."}, {"grade": "5", "topic": "Quantifiers: some/any, how much/how many, a little/a few", "ref": "8b", "owner": "Арина", "desc": "some/any, how much/how many, a little/a few; выбор формы для countable/uncountable nouns."}, {"grade": "5", "topic": "Past Simple: regular & irregular verbs", "ref": "9b–9c", "owner": "Даша", "desc": "Правильные и неправильные глаголы; утверждение, отрицание, вопросы; did/didn’t."}, {"grade": "5", "topic": "Must / mustn’t", "ref": "Culture Corner 9", "owner": "Арина", "desc": "must/mustn’t для обязанности и запрета; правила поведения и инструкции."}, {"grade": "5", "topic": "Future: Future Simple & be going to", "ref": "10b", "owner": "Даша", "desc": "will и be going to; будущие решения/прогнозы против планов и намерений."}, {"grade": "6", "topic": "Possessives: adjectives, case & pronouns", "ref": "1a–1b", "owner": "Арина", "desc": "Притяжательные прилагательные, притяжательный падеж и possessive pronouns; выбор формы по позиции."}, {"grade": "6", "topic": "Comparisons with as … as / not as … as", "ref": "1a", "owner": "Даша", "desc": "as…as, not as…as / not so…as; сравнение равенства и неравенства."}, {"grade": "6", "topic": "Prepositions of time & place", "ref": "2a–2b", "owner": "Арина", "desc": "Предлоги времени и места в датах, времени, комнате, доме и городе."}, {"grade": "6", "topic": "Articles and determiners: a(n), some, any", "ref": "2b", "owner": "Даша", "desc": "a/an с исчисляемыми существительными; some/any в утверждениях, вопросах и отрицаниях."}, {"grade": "6", "topic": "Indefinite pronouns: something/anything/somebody/anybody etc.", "ref": "2b", "owner": "Арина", "desc": "something/somebody/someone и anything/anybody/anyone; выбор формы по типу предложения."}, {"grade": "6", "topic": "Imperative", "ref": "3a", "owner": "Даша", "desc": "Утвердительные и отрицательные инструкции, правила и команды."}, {"grade": "6", "topic": "Modal verbs: can / may / be able to / should", "ref": "3b", "owner": "Арина", "desc": "can, may, be able to для возможности/разрешения/способности; should для совета."}, {"grade": "6", "topic": "Relative pronouns: who / that / which / whose", "ref": "3c", "owner": "Даша", "desc": "who, which, that, whose в определительных придаточных о людях и предметах."}, {"grade": "6", "topic": "Present Simple", "ref": "4a–4b", "owner": "Арина", "desc": "Утверждения, отрицания, вопросы и краткие ответы; ежедневные привычки и регулярные действия."}, {"grade": "6", "topic": "Adverbs of frequency & like/hate + -ing", "ref": "4a", "owner": "Даша", "desc": "Наречия частотности и их позиция; конструкции like/hate + -ing для предпочтений."}, {"grade": "6", "topic": "Reflexive pronouns", "ref": "4c", "owner": "Арина", "desc": "myself, yourself, himself, herself, itself, ourselves, yourselves, themselves."}, {"grade": "6", "topic": "Present Continuous", "ref": "5a–5b", "owner": "Даша", "desc": "am/is/are + V-ing; утверждение, отрицание и вопросы; происходящее сейчас."}, {"grade": "6", "topic": "Present Continuous vs Past Continuous", "ref": "6b", "owner": "Арина", "desc": "Процесс сейчас и процесс в определённый момент в прошлом; формы Continuous."}, {"grade": "6", "topic": "Past Simple: regular & irregular verbs", "ref": "7a–7b", "owner": "Даша", "desc": "Правильные и неправильные глаголы; Past Simple в утверждениях, отрицаниях и вопросах."}, {"grade": "6", "topic": "Past Simple vs Past Continuous", "ref": "7b", "owner": "Арина", "desc": "Завершённое действие и длительный процесс в прошлом; фон и событие."}, {"grade": "6", "topic": "Modal rules: must / mustn’t / can’t / have to / needn’t", "ref": "8a–8c", "owner": "Даша", "desc": "must, mustn’t, can’t, have to, don’t have to, needn’t; обязанность, запрет и отсутствие необходимости."}, {"grade": "6", "topic": "Comparatives: adjectives & adverbs", "ref": "8b–8c", "owner": "Арина", "desc": "Сравнительная/превосходная степени прилагательных и сравнение наречий."}, {"grade": "6", "topic": "Countable / uncountable nouns & quantifiers", "ref": "9a", "owner": "Даша", "desc": "Countable/uncountable nouns, quantifiers и some-/any-compounds."}, {"grade": "6", "topic": "Present Perfect", "ref": "9b", "owner": "Арина", "desc": "have/has + V3; опыт и результат; утверждение, отрицание и вопросы."}, {"grade": "6", "topic": "Future forms: be going to / Present Continuous / will", "ref": "10a–10b", "owner": "Даша", "desc": "be going to, Present Continuous и will; планы, договорённости, решения и прогнозы."}, {"grade": "7", "topic": "Present Simple vs Present Continuous", "ref": "1a", "owner": "Арина", "desc": "Привычки и факты против действий сейчас; маркеры времени и выбор формы."}, {"grade": "7", "topic": "Should / shouldn’t", "ref": "1b", "owner": "Даша", "desc": "should/shouldn’t для советов и рекомендаций; вопросы с should."}, {"grade": "7", "topic": "Pronouns: both, another, other", "ref": "1d / 2a", "owner": "Арина", "desc": "both для двух объектов; another и other для другого/дополнительного объекта или группы."}, {"grade": "7", "topic": "Past Simple", "ref": "2a", "owner": "Даша", "desc": "Past Simple для завершённых действий; правильные и неправильные формы в рассказе."}, {"grade": "7", "topic": "Used to", "ref": "2b", "owner": "Арина", "desc": "Прошлые привычки и состояния, которых больше нет; утверждения, отрицания и вопросы."}, {"grade": "7", "topic": "Complex Object", "ref": "2c", "owner": "Даша", "desc": "Конструкции object + infinitive после глаголов типа want/expect/ask."}, {"grade": "7", "topic": "Relative pronouns & relative adverbs", "ref": "3a / 3d", "owner": "Арина", "desc": "Relative pronouns и relative adverbs для связи информации о людях, местах и предметах."}, {"grade": "7", "topic": "-ed / -ing participles", "ref": "3b", "owner": "Даша", "desc": "Прилагательные на -ed и -ing: состояние человека против свойства ситуации/объекта."}, {"grade": "7", "topic": "Order of adjectives", "ref": "3b / 9c", "owner": "Арина", "desc": "Порядок нескольких прилагательных перед существительным."}, {"grade": "7", "topic": "Past Continuous & Past Simple vs Past Continuous", "ref": "4a–4b", "owner": "Даша", "desc": "Past Continuous и его отличие от Past Simple; фон, процесс и прерывающее событие."}, {"grade": "7", "topic": "Future Simple & future forms", "ref": "5a–5b", "owner": "Арина", "desc": "will и другие формы будущего; прогнозы, решения и планы."}, {"grade": "7", "topic": "Conditionals 0 & 1; if / unless", "ref": "5b / 10a", "owner": "Даша", "desc": "Zero Conditional, First Conditional, if и unless; закономерности и реальное будущее."}, {"grade": "7", "topic": "Linkers", "ref": "5c / 8c", "owner": "Арина", "desc": "Связки для добавления, противопоставления и вывода; логика между предложениями."}, {"grade": "7", "topic": "Present Perfect", "ref": "6a–6b", "owner": "Даша", "desc": "have/has + V3; опыт, результат и связь прошлого действия с настоящим."}, {"grade": "7", "topic": "Present Perfect markers: already/yet/just/ever/never/before", "ref": "6b", "owner": "Арина", "desc": "already, yet, just, ever, never, before: значение и позиция в Present Perfect."}, {"grade": "7", "topic": "Has gone / has been", "ref": "6c", "owner": "Даша", "desc": "has gone to и has been to; нахождение человека сейчас против опыта посещения."}, {"grade": "7", "topic": "Comparatives & superlatives", "ref": "7a", "owner": "Арина", "desc": "Comparatives/superlatives, regular/irregular forms и основные сравнительные конструкции."}, {"grade": "7", "topic": "Passive Voice", "ref": "7b", "owner": "Даша", "desc": "Базовая модель be + V3; фокус на действии, а не на исполнителе."}, {"grade": "7", "topic": "Present Perfect Continuous & Present Perfect vs PPC", "ref": "8a / 9b", "owner": "Арина", "desc": "have/has been + V-ing; длительность до настоящего; результат против процесса."}, {"grade": "7", "topic": "Modals, quantifiers & verb patterns: have to/must/might; to-infinitive/-ing", "ref": "8b / 9a–9b / 10b", "owner": "Даша", "desc": "have to/must/might, quantifiers и to-infinitive/-ing; обязанность, вероятность, количество и verb patterns."}, {"grade": "8", "topic": "Present tenses & stative verbs", "ref": "1c", "owner": "Арина", "desc": "Повторение настоящих времён и stative verbs, которые обычно не используются в Continuous."}, {"grade": "8", "topic": "Future forms: will / be going to / Present Simple / Present Continuous", "ref": "1c", "owner": "Даша", "desc": "will, be going to, Present Simple и Present Continuous для прогнозов, намерений, расписаний и договорённостей."}, {"grade": "8", "topic": "Past Simple vs Past Continuous", "ref": "1c / 3c", "owner": "Арина", "desc": "Завершённые события и длительные действия в прошлом; фон и событие."}, {"grade": "8", "topic": "Comparatives, superlatives & adverbs of degree", "ref": "1d", "owner": "Даша", "desc": "Comparatives/superlatives и adverbs of degree для усиления/ослабления степени."}, {"grade": "8", "topic": "Present Perfect vs Present Perfect Continuous", "ref": "2c", "owner": "Арина", "desc": "Present Perfect для результата/опыта и Present Perfect Continuous для длительности/процесса."}, {"grade": "8", "topic": "Negative pronouns & quantifiers", "ref": "2c", "owner": "Даша", "desc": "Negative pronouns и quantifiers; отрицательные формы и количество в контексте."}, {"grade": "8", "topic": "Has gone to / has been to / in", "ref": "2c", "owner": "Арина", "desc": "gone to, been to и been in; текущее местонахождение, опыт и длительность пребывания."}, {"grade": "8", "topic": "Articles: a/an / the", "ref": "2c", "owner": "Даша", "desc": "a/an и the в более сложных контекстах; повторение выбора артикля."}, {"grade": "8", "topic": "Nouns: singular & plural", "ref": "2d", "owner": "Арина", "desc": "Единственное и множественное число; согласование существительного с другими элементами."}, {"grade": "8", "topic": "Order of adjectives", "ref": "2e", "owner": "Даша", "desc": "Порядок нескольких прилагательных перед существительным."}, {"grade": "8", "topic": "Past Perfect & Past Perfect Continuous", "ref": "3c", "owner": "Арина", "desc": "Past Perfect и Past Perfect Continuous; завершённость/длительность до прошлого момента."}, {"grade": "8", "topic": "Complex Object", "ref": "3c", "owner": "Даша", "desc": "Object + infinitive после ряда глаголов; желание, ожидание или побуждение."}, {"grade": "8", "topic": "Adjectives vs adverbs & sequencing events", "ref": "3e", "owner": "Арина", "desc": "Adjectives vs adverbs и языковые средства последовательности событий."}, {"grade": "8", "topic": "Too / enough", "ref": "4b", "owner": "Даша", "desc": "too + adjective/adverb; adjective/adverb + enough; enough + noun."}, {"grade": "8", "topic": "Passive Voice & causative form", "ref": "4c–4d", "owner": "Арина", "desc": "Passive Voice и causative have/get something done; действие выполняет другой человек."}, {"grade": "8", "topic": "Infinitive / -ing forms", "ref": "5c / 5f", "owner": "Даша", "desc": "Глагольные модели с to-infinitive и gerund; выбор формы после определённых глаголов/выражений."}, {"grade": "8", "topic": "Used to / be used to / get used to", "ref": "5c", "owner": "Арина", "desc": "used to, be used to, get used to: прошлая привычка, привычность и процесс привыкания."}, {"grade": "8", "topic": "Both … and / either … or / neither … nor", "ref": "5e / 8d", "owner": "Даша", "desc": "both…and, either…or, neither…nor; оба, один из двух, ни один из двух."}, {"grade": "8", "topic": "Reported Speech & reported questions", "ref": "6c / 6f", "owner": "Арина", "desc": "Reported Speech, said/told и reported questions; изменение структуры вопроса."}, {"grade": "8", "topic": "Modals, deductions & conditionals", "ref": "7c / 7f / 8c / 8f", "owner": "Даша", "desc": "Modals и deductions; conditionals с if/when/unless, включая Type 3."}, {"grade": "9", "topic": "Present tenses: Simple, Continuous, Perfect, Perfect Continuous", "ref": "1c", "owner": "Арина", "desc": "Системное сравнение Present Simple, Continuous, Perfect и Perfect Continuous: привычка, процесс, результат, длительность."}, {"grade": "9", "topic": "Adverbs of frequency & exclamations", "ref": "1c", "owner": "Даша", "desc": "Позиция adverbs of frequency и основные модели exclamations."}, {"grade": "9", "topic": "Relative clauses", "ref": "1d", "owner": "Арина", "desc": "Relative clauses и относительные слова; добавление информации о существительном."}, {"grade": "9", "topic": "Infinitive / -ing forms", "ref": "2c", "owner": "Даша", "desc": "Infinitive и gerund после глаголов/выражений; выбор формы по модели."}, {"grade": "9", "topic": "Too / enough & Complex Object", "ref": "2c", "owner": "Арина", "desc": "too/enough и Complex Object; достаточность/избыточность плюс object + infinitive."}, {"grade": "9", "topic": "Order of adjectives", "ref": "2d", "owner": "Даша", "desc": "Порядок качественных, размерных, возрастных и других прилагательных."}, {"grade": "9", "topic": "Direct & indirect questions", "ref": "2e", "owner": "Арина", "desc": "Прямые и косвенные вопросы; изменение порядка слов в indirect questions."}, {"grade": "9", "topic": "Informal style structures", "ref": "2e", "owner": "Даша", "desc": "Грамматические особенности informal style, вынесенные в соответствующий раздел учебника."}, {"grade": "9", "topic": "Past tenses: Simple, Continuous, Perfect, Perfect Continuous", "ref": "3c", "owner": "Арина", "desc": "Past Simple, Continuous, Perfect и Perfect Continuous; событие, процесс, предшествование и длительность."}, {"grade": "9", "topic": "Used to / would", "ref": "3c", "owner": "Даша", "desc": "used to и would для прошлых привычек и повторяющихся действий."}, {"grade": "9", "topic": "Modals of assumption: must / can’t / may", "ref": "3d", "owner": "Арина", "desc": "must, can’t, may для разной степени уверенности в предположении."}, {"grade": "9", "topic": "Adverbs in narratives", "ref": "3e", "owner": "Даша", "desc": "Наречия для описания способа действия и развития повествования."}, {"grade": "9", "topic": "Future forms: Simple, Continuous, Perfect, Perfect Continuous", "ref": "4c", "owner": "Арина", "desc": "Future Simple, Continuous, Perfect и Perfect Continuous; действие, процесс, завершённость и длительность в будущем."}, {"grade": "9", "topic": "Present tenses for future & time clauses", "ref": "4c", "owner": "Даша", "desc": "Present Simple/Continuous для будущего и time clauses с when/before/after и др."}, {"grade": "9", "topic": "Clauses of purpose / result & linkers", "ref": "4c / 4e", "owner": "Арина", "desc": "Clauses of purpose/result и linkers для логической структуры текста."}, {"grade": "9", "topic": "Comparatives & superlatives; gradable/non-gradable adjectives", "ref": "5c", "owner": "Даша", "desc": "Comparatives/superlatives и gradable/non-gradable adjectives; подходящие усилители."}, {"grade": "9", "topic": "Would prefer / would rather / sooner", "ref": "5d", "owner": "Арина", "desc": "would prefer, would rather, sooner; грамматическое оформление предпочтений."}, {"grade": "9", "topic": "Passive Voice & causative", "ref": "6c", "owner": "Даша", "desc": "Passive Voice и causative; действие выполнено субъектом или организовано им."}, {"grade": "9", "topic": "Conditionals 0–3, wishes & present modals", "ref": "7c–7d", "owner": "Арина", "desc": "Conditionals 0–3, wishes и повторение present modals."}, {"grade": "9", "topic": "Reported Speech, reporting verbs, question tags & formal style", "ref": "8c–8e", "owner": "Даша", "desc": "Reported Speech, reporting verbs, question tags и formal style structures."}];
+const grades = ["5","6","7","8","9"];
+let currentGrade = "5";
+let ownerFilter = "all";
+const done = JSON.parse(localStorage.getItem("spotlightGrammarDone20") || "{}");
+
+const tabs = document.getElementById("gradeTabs");
+grades.forEach(g => {
+  const n = items.filter(x=>x.grade===g).length;
+  const b = document.createElement("button");
+  b.className = "grade-tab" + (g===currentGrade ? " active" : "");
+  b.textContent = `${g} класс · ${n}`;
+  b.onclick = () => {
+    currentGrade = g;
+    document.querySelectorAll(".grade-tab").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    render();
+  };
+  tabs.appendChild(b);
+});
+
+document.querySelectorAll("[data-owner]").forEach(btn => {
+  btn.onclick = () => {
+    ownerFilter = btn.dataset.owner;
+    document.querySelectorAll("[data-owner]").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    render();
+  };
+});
+
+document.getElementById("search").addEventListener("input", render);
+
+function keyFor(x) { return `${x.grade}|${x.topic}`; }
+
+function render() {
+  const q = document.getElementById("search").value.trim().toLowerCase();
+  const gradeItems = items.filter(x=>x.grade===currentGrade);
+  const arina = gradeItems.filter(x=>x.owner==="Арина").length;
+  const dasha = gradeItems.filter(x=>x.owner==="Даша").length;
+  document.getElementById("gradeTitle").textContent = `${currentGrade} класс`;
+  document.getElementById("gradeSummary").textContent = `${gradeItems.length} тем · Арина ${arina} · Даша ${dasha}`;
+
+  const filtered = gradeItems.filter(x =>
+    (ownerFilter==="all" || x.owner===ownerFilter) &&
+    (!q || x.topic.toLowerCase().includes(q) || x.ref.toLowerCase().includes(q))
+  );
+
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty">По этим фильтрам ничего не найдено.</div>';
+    return;
+  }
+
+  filtered.forEach((x, idx) => {
+    const id = keyFor(x);
+    const isDone = !!done[id];
+    const card = document.createElement("article");
+    card.className = "card" + (isDone ? " done" : "");
+    card.innerHTML = `
+      <div class="num">${String(gradeItems.indexOf(x)+1).padStart(2,"0")}</div>
+      <div>
+        <div class="topic">${x.topic}</div>
+        <div class="meta">Spotlight: ${x.ref}</div>
+        <div class="details"><b>Что входит</b>${x.desc}</div>
+        <label class="check"><input type="checkbox" ${isDone ? "checked" : ""}> готово</label>
+      </div>
+      <span class="owner ${x.owner==="Арина" ? "arina" : "dasha"}">${x.owner}</span>
+    `;
+    const cb = card.querySelector("input");
+    cb.addEventListener("change", () => {
+      done[id] = cb.checked;
+      localStorage.setItem("spotlightGrammarDone20", JSON.stringify(done));
+      card.classList.toggle("done", cb.checked);
+    });
+    grid.appendChild(card);
+  });
+}
+
+function copyOwner(owner) {
+  const lines = [];
+  grades.forEach(g => {
+    const list = items.filter(x=>x.grade===g && x.owner===owner);
+    lines.push(`${g} класс`);
+    list.forEach((x,i)=>lines.push(`${i+1}. ${x.topic} — ${x.ref}\n   Что входит: ${x.desc}`));
+    lines.push("");
+  });
+  navigator.clipboard.writeText(lines.join("\n")).then(showToast);
+}
+function showToast() {
+  const t = document.getElementById("toast");
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 1400);
+}
+document.getElementById("copyArina").onclick = ()=>copyOwner("Арина");
+document.getElementById("copyDasha").onclick = ()=>copyOwner("Даша");
+
+render();
+</script>
+</body>
+</html>
